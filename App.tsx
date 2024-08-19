@@ -1,137 +1,128 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, ImageBackground, TouchableOpacity, TextInput, FlatList } from 'react-native';
+import { View, Text, TextInput, TouchableHighlight, StyleSheet } from 'react-native';
 
-interface Task {
+export type Task = {
   id: number;
-  text: string;
-  completed: boolean;
-}
+  task: string;
+  name: string;
+  surname: string;
+  studentNumber: string;
+};
 
-export default function App() {
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const [newTask, setNewTask] = useState('');
+export type RootParamList = {
+  ViewScreen: undefined;
+  AddTaskScreen: undefined;
+};
 
-  const handlePress = (taskId: number) => {
-    const updatedTasks = tasks.map(task =>
-      task.id === taskId ? { ...task, completed: !task.completed } : task
-    );
-    setTasks(updatedTasks);
-  };
+function App() {
+  const [name, setName] = useState<string>('');
+  const [surname, setSurname] = useState<string>('');
+  const [studentNumber, setStudentNumber] = useState<string>('');
+  const [submitted, setSubmitted] = useState<boolean>(false);
 
-  const addTask = () => {
-    if (newTask.trim()) {
-      setTasks([...tasks, { id: Date.now(), text: newTask, completed: false }]);
-      setNewTask('');
-    } else {
-      alert('Please enter a task!');
+  const AddTaskOnPress = () => {
+    if (name && surname && studentNumber) {
+      setSubmitted(true);
     }
   };
 
-  const renderItem = ({ item }: { item: Task }) => (
-    <TouchableOpacity
-      style={[styles.taskBox, item.completed ? styles.completedTask : {}]}
-      onPress={() => handlePress(item.id)}
-    >
-      <Text style={[styles.task, item.completed ? styles.completedTaskText : {}]}>{item.text}</Text>
-    </TouchableOpacity>
-  );
-
-  return (
-    <ImageBackground source={require('./assets/image.png')} style={styles.image}>
-      <View style={styles.container}>
-        <Text style={styles.heading}>My Task List</Text>
-
-        <View style={styles.taskContainer}>
-          <FlatList
-            data={tasks}
-            renderItem={renderItem}
-            keyExtractor={(item) => item.id.toString()}
-          />
-        </View>
-
-        <View style={styles.addTaskContainer}>
-          <TextInput
-            style={styles.addTaskInput}
-            placeholder="Add a task"
-            value={newTask}
-            onChangeText={setNewTask}
-          />
-          <TouchableOpacity style={styles.addButton} onPress={addTask}>
-            <Text style={styles.addButtonText}>Add</Text>
-          </TouchableOpacity>
-        </View>
-
-      
+  const FirstScreen = () => (
+    <View style={styles.firstScreen}>
+      <Text style={styles.heading}>Student Information</Text>
+      <View style={styles.userInputView}>
+        <TextInput
+          style={styles.input}
+          placeholder="Name"
+          value={name}
+          onChangeText={setName}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Surname"
+          value={surname}
+          onChangeText={setSurname}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Student Number"
+          value={studentNumber}
+          onChangeText={setStudentNumber}
+        />
+        <TouchableHighlight onPress={AddTaskOnPress} style={styles.button}>
+          <Text style={styles.buttonText}>Submit</Text>
+        </TouchableHighlight>
       </View>
-    </ImageBackground>
+    </View>
   );
+
+  const SecondScreen = () => (
+    <View style={styles.secondScreen}>
+      <Text style={styles.welcomeText}>Welcome, {name} {surname}!</Text>
+      <Text style={styles.studentNumberText}>Your Student Number is: {studentNumber}</Text>
+    </View>
+  );
+
+  return submitted ? <SecondScreen /> : <FirstScreen />;
 }
 
 const styles = StyleSheet.create({
-  image: {
+  firstScreen: {
     flex: 1,
-    resizeMode: 'cover',
-    justifyContent: 'center',
-  },
-  container: {
-    flex: 1,
+    backgroundColor: 'lightblue',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  secondScreen: {
+    flex: 1,
+    backgroundColor: 'lightgreen',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   heading: {
-    fontSize: 24,
+    margin: 20,
+    fontSize: 30,
+    color: 'darkblue',
     fontWeight: 'bold',
-    color: '#fff',
-    marginBottom: 20,
   },
-  taskContainer: {
-    flex: 1,
-    width: '80%',
+  userInputView: {
+    width: 300,
+    marginVertical: 15,
+    padding: 20,
+    backgroundColor: 'white',
+    borderRadius: 10,
   },
-  taskBox: {
-    padding: 10,
-    borderWidth: 1,
-    borderColor: '#fff',
+  input: {
+    width: '100%',
+    height: 40,
+    backgroundColor: 'lightgrey',
+    paddingHorizontal: 10,
+    marginVertical: 10,
     borderRadius: 5,
-    marginBottom: 5,
-    alignItems: 'center',
+    color: 'black',
+    fontSize: 18,
   },
-  task: {
-    fontSize: 16,
-    color: '#fff',
-  },
-  addTaskContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    width: '80%',
-    marginBottom: 20,
-  },
-  addTaskInput: {
-    flex: 1,
-    padding: 10,
-    borderWidth: 1,
-    borderColor: '#fff',
-    borderRadius: 5,
-    marginRight: 10,
-    color: '#fff', // Ensures text is visible in dark background
-  },
-  addButton: {
-    backgroundColor: '#fff',
-    paddingHorizontal: 15,
+  button: {
+    backgroundColor: 'darkblue',
     paddingVertical: 10,
-    borderRadius: 5,
+    borderRadius: 10,
+    marginTop: 20,
+    alignItems: 'center',
   },
-  addButtonText: {
-    color: '#000',
-    fontSize: 16,
+  buttonText: {
+    color: 'white',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
-  completedTask: {
-    backgroundColor: '#ccc',
+  welcomeText: {
+    fontSize: 30,
+    fontWeight: 'bold',
+    color: 'darkgreen',
+    marginBottom: 20,
   },
-  completedTaskText: {
-    color: '#888',
-    textDecorationLine: 'line-through', // Correctly applies line-through for completed tasks
+  studentNumberText: {
+    fontSize: 25,
+    color: 'black',
   },
 });
+
+export default App;
